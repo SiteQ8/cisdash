@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISDash | أداة الامتثال CIS</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2235;
+  --bg-card-hover: #1e2940;
+  --border: #2a3654;
+  --border-active: #3b82f6;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-green: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-purple: #8b5cf6;
+  --accent-gold: #d4a843;
+  --gradient-cis: linear-gradient(135deg, #3b82f6, #06b6d4);
+  --gradient-pci: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  --gradient-iso: linear-gradient(135deg, #10b981, #34d399);
+  --gradient-swift: linear-gradient(135deg, #f59e0b, #fbbf24);
+  --gradient-corf: linear-gradient(135deg, #d4a843, #e8c76a);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 30px rgba(59,130,246,0.15);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body[dir="rtl"] {
+  font-family: var(--font-arabic);
+}
+
+/* Background Pattern */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(6,182,212,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grid pattern overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; }
+
+/* ── Top Bar ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 28px;
+  background: rgba(17,24,39,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar-logo {
+  width: 42px; height: 42px;
+  background: var(--gradient-cis);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1px;
+  box-shadow: 0 0 20px rgba(59,130,246,0.3);
+}
+
+.topbar-title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.topbar-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-active);
+}
+
+.btn-primary {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+  box-shadow: 0 0 20px rgba(59,130,246,0.3);
+}
+
+.btn-icon {
+  padding: 8px 10px;
+  font-size: 16px;
+}
+
+.lang-toggle {
+  font-family: var(--font-arabic);
+  font-weight: 600;
+}
+
+/* ── Layout ── */
+.layout {
+  display: flex;
+  min-height: calc(100vh - 65px);
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 260px;
+  background: rgba(17,24,39,0.6);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid var(--border);
+  padding: 20px 0;
+  flex-shrink: 0;
+}
+
+body[dir="rtl"] .sidebar {
+  border-right: none;
+  border-left: 1px solid var(--border);
+}
+
+.sidebar-section {
+  padding: 0 16px;
+  margin-bottom: 24px;
+}
+
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.sidebar-item:hover {
+  background: rgba(59,130,246,0.08);
+  color: var(--text-primary);
+}
+
+.sidebar-item.active {
+  background: rgba(59,130,246,0.12);
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+
+.sidebar-item .icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+}
+
+.sidebar-badge {
+  margin-inline-start: auto;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(59,130,246,0.15);
+  color: var(--accent-blue);
+}
+
+/* ── Main Content ── */
+.main {
+  flex: 1;
+  padding: 28px;
+  overflow-y: auto;
+  max-height: calc(100vh - 65px);
+}
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── Dashboard Overview ── */
+.dashboard-header {
+  margin-bottom: 28px;
+}
+
+.dashboard-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+
+.dashboard-header p {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  border-color: var(--border-active);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+}
+
+.stat-card.cis::before { background: var(--gradient-cis); }
+.stat-card.pci::before { background: var(--gradient-pci); }
+.stat-card.iso::before { background: var(--gradient-iso); }
+.stat-card.swift::before { background: var(--gradient-swift); }
+.stat-card.corf::before { background: var(--gradient-corf); }
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  letter-spacing: -1px;
+}
+
+.stat-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+
+.stat-bar {
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* ── Section Panels ── */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.panel-body {
+  padding: 20px;
+}
+
+/* ── CIS Controls Table ── */
+.controls-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 240px;
+  padding: 10px 16px;
+  padding-inline-start: 40px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.search-box:focus {
+  border-color: var(--accent-blue);
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 240px;
+}
+
+.search-wrap::before {
+  content: '🔍';
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+}
+
+body[dir="rtl"] .search-wrap::before {
+  left: auto;
+  right: 14px;
+}
+
+.filter-select {
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  cursor: pointer;
+}
+
+.controls-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.controls-table th {
+  text-align: start;
+  padding: 10px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+}
+
+.controls-table td {
+  padding: 12px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(42,54,84,0.5);
+  vertical-align: top;
+}
+
+.controls-table tr:hover td {
+  background: rgba(59,130,246,0.04);
+}
+
+.control-id {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  white-space: nowrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-badge.compliant {
+  background: rgba(16,185,129,0.12);
+  color: var(--accent-green);
+}
+
+.status-badge.partial {
+  background: rgba(245,158,11,0.12);
+  color: var(--accent-amber);
+}
+
+.status-badge.non-compliant {
+  background: rgba(239,68,68,0.12);
+  color: var(--accent-red);
+}
+
+.status-badge.not-assessed {
+  background: rgba(100,116,139,0.12);
+  color: var(--text-muted);
+}
+
+.mapping-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.mapping-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.3px;
+}
+
+.mapping-tag.pci { background: rgba(139,92,246,0.15); color: #a78bfa; }
+.mapping-tag.iso { background: rgba(16,185,129,0.15); color: #34d399; }
+.mapping-tag.swift { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.mapping-tag.corf { background: rgba(212,168,67,0.15); color: #e8c76a; }
+
+.status-select {
+  padding: 5px 10px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* ── Compliance Checker ── */
+.checker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .checker-grid { grid-template-columns: 1fr; }
+}
+
+.check-category {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.check-category-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(42,54,84,0.3);
+}
+
+.check-item:last-child { border-bottom: none; }
+
+.check-item input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 5px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.2s;
+}
+
+.check-item input[type="checkbox"]:checked {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.check-item input[type="checkbox"]:checked::after {
+  content: '✓';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  width: 100%;
+  height: 100%;
+}
+
+.check-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* ── Mapping Matrix ── */
+.matrix-container {
+  overflow-x: auto;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.matrix-table th {
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.matrix-table td {
+  padding: 8px 12px;
+  text-align: center;
+  border: 1px solid rgba(42,54,84,0.5);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.matrix-table tr:hover td {
+  background: rgba(59,130,246,0.04);
+}
+
+.matrix-cell-active {
+  background: rgba(59,130,246,0.1);
+  color: var(--accent-cyan);
+  font-weight: 500;
+}
+
+/* ── Report ── */
+.report-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.report-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.report-metric {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  text-align: center;
+}
+
+.report-metric .big {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.report-metric .label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+/* ── Donut Chart ── */
+.chart-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.chart-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chart-box h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.donut-wrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+.donut-wrap svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.donut-wrap .center-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.donut-wrap .center-label .pct {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.donut-wrap .center-label .sub {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.chart-legend {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { padding: 16px; }
+  .topbar { padding: 10px 16px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .checker-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Animations ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page.active > * {
+  animation: fadeInUp 0.4s ease-out both;
+}
+
+.page.active > *:nth-child(2) { animation-delay: 0.05s; }
+.page.active > *:nth-child(3) { animation-delay: 0.1s; }
+.page.active > *:nth-child(4) { animation-delay: 0.15s; }
+.page.active > *:nth-child(5) { animation-delay: 0.2s; }
+
+/* Print styles */
+@media print {
+  .topbar, .sidebar { display: none !important; }
+  .main { max-height: none; padding: 0; }
+  body { background: white; color: black; }
+  .panel, .stat-card { border-color: #ddd; background: white; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">CIS</div>
+      <div>
+        <div class="topbar-title" data-i18n="appTitle">CISDash</div>
+        <div class="topbar-subtitle" data-i18n="appSub">Multi-Framework Compliance Dashboard</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-icon lang-toggle" onclick="toggleLanguage()" title="عربي / English">🌐</button>
+      <button class="btn" onclick="exportJSON()" data-i18n="exportBtn">💾 Export</button>
+      <button class="btn" onclick="importJSON()" data-i18n="importBtn">📂 Import</button>
+      <button class="btn btn-primary" onclick="generatePDFReport()" data-i18n="reportBtn">📊 Report</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label" data-i18n="navMain">Main</div>
+        <div class="sidebar-item active" data-page="dashboard" onclick="showPage('dashboard', this)">
+          <span class="icon">📊</span>
+          <span data-i18n="navDashboard">Dashboard</span>
+        </div>
+        <div class="sidebar-item" data-page="checker" onclick="showPage('checker', this)">
+          <span class="icon">✅</span>
+          <span data-i18n="navChecker">Compliance Checker</span>
+        </div>
+        <div class="sidebar-item" data-page="controls" onclick="showPage('controls', this)">
+          <span class="icon">🛡️</span>
+          <span data-i18n="navControls">CIS Controls</span>
+          <span class="sidebar-badge">18</span>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label" data-i18n="navMapping">Mapping</div>
+        <div class="sidebar-item" data-page="mapping" onclick="showPage('mapping', this)">
+          <span class="icon">🔗</span>
+          <span data-i18n="navMatrix">Mapping Matrix</span>
+        </div>
+        <div class="sidebar-item" data-page="frameworks" onclick="showPage('frameworks', this)">
+          <span class="icon">📋</span>
+          <span data-i18n="navFrameworks">Frameworks</span>
+          <span class="sidebar-badge">5</span>
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label" data-i18n="navReports">Reports</div>
+        <div class="sidebar-item" data-page="report" onclick="showPage('report', this)">
+          <span class="icon">📄</span>
+          <span data-i18n="navReport">Assessment Report</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main">
+
+      <!-- ════════ DASHBOARD PAGE ════════ -->
+      <div id="page-dashboard" class="page active">
+        <div class="dashboard-header">
+          <h1 data-i18n="dashTitle">Compliance Overview</h1>
+          <p data-i18n="dashSub">Real-time compliance posture across CIS, PCI DSS, ISO 27001, SWIFT CSP & Kuwait CBK CORF</p>
+        </div>
+
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="chart-row" id="chartRow"></div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title" data-i18n="recentActivity">Recent Assessment Activity</span>
+          </div>
+          <div class="panel-body" id="activityLog"></div>
+        </div>
+      </div>
+
+      <!-- ════════ CHECKER PAGE ════════ -->
+      <div id="page-checker" class="page">
+        <div class="dashboard-header">
+          <h1 data-i18n="checkerTitle">Compliance Checker</h1>
+          <p data-i18n="checkerSub">Interactively assess your compliance with CIS Controls v8</p>
+        </div>
+        <div class="controls-toolbar">
+          <div class="search-wrap">
+            <input type="text" class="search-box" id="checkerSearch" placeholder="Search checks..." data-i18n-ph="searchChecks" oninput="filterChecks()">
+          </div>
+          <select class="filter-select" id="checkerFilter" onchange="filterChecks()">
+            <option value="all" data-i18n="filterAll">All Categories</option>
+          </select>
+          <button class="btn btn-primary" onclick="runAssessment()" data-i18n="runAssess">▶ Run Assessment</button>
+        </div>
+        <div class="checker-grid" id="checkerGrid"></div>
+      </div>
+
+      <!-- ════════ CONTROLS PAGE ════════ -->
+      <div id="page-controls" class="page">
+        <div class="dashboard-header">
+          <h1 data-i18n="controlsTitle">CIS Controls v8</h1>
+          <p data-i18n="controlsSub">All 18 CIS Controls with status tracking and framework mapping</p>
+        </div>
+        <div class="controls-toolbar">
+          <div class="search-wrap">
+            <input type="text" class="search-box" id="controlSearch" placeholder="Search controls..." data-i18n-ph="searchControls" oninput="filterControls()">
+          </div>
+          <select class="filter-select" id="statusFilter" onchange="filterControls()">
+            <option value="all" data-i18n="filterAll">All Statuses</option>
+            <option value="compliant" data-i18n="statusCompliant">Compliant</option>
+            <option value="partial" data-i18n="statusPartial">Partially Compliant</option>
+            <option value="non-compliant" data-i18n="statusNonCompliant">Non-Compliant</option>
+            <option value="not-assessed" data-i18n="statusNotAssessed">Not Assessed</option>
+          </select>
+          <select class="filter-select" id="frameworkFilter" onchange="filterControls()">
+            <option value="all">All Frameworks</option>
+            <option value="pci">PCI DSS</option>
+            <option value="iso">ISO 27001</option>
+            <option value="swift">SWIFT CSP</option>
+            <option value="corf">CBK CORF</option>
+          </select>
+        </div>
+        <div class="panel">
+          <div class="panel-body" style="padding:0;">
+            <table class="controls-table">
+              <thead>
+                <tr>
+                  <th data-i18n="thID">ID</th>
+                  <th data-i18n="thControl">Control</th>
+                  <th data-i18n="thMapping">Mapping</th>
+                  <th data-i18n="thStatus">Status</th>
+                  <th data-i18n="thAction">Action</th>
+                </tr>
+              </thead>
+              <tbody id="controlsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ MAPPING PAGE ════════ -->
+      <div id="page-mapping" class="page">
+        <div class="dashboard-header">
+          <h1 data-i18n="mappingTitle">Cross-Framework Mapping Matrix</h1>
+          <p data-i18n="mappingSub">See how CIS Controls map to PCI DSS, ISO 27001, SWIFT CSP, and Kuwait CBK CORF</p>
+        </div>
+        <div class="panel">
+          <div class="panel-body matrix-container" id="mappingMatrix"></div>
+        </div>
+      </div>
+
+      <!-- ════════ FRAMEWORKS PAGE ════════ -->
+      <div id="page-frameworks" class="page">
+        <div class="dashboard-header">
+          <h1 data-i18n="fwTitle">Supported Frameworks</h1>
+          <p data-i18n="fwSub">Comprehensive coverage across international and regional compliance standards</p>
+        </div>
+        <div class="stats-grid" id="frameworkCards"></div>
+      </div>
+
+      <!-- ════════ REPORT PAGE ════════ -->
+      <div id="page-report" class="page">
+        <div class="dashboard-header">
+          <h1 data-i18n="rptTitle">Assessment Report</h1>
+          <p data-i18n="rptSub">Generate and export compliance assessment reports</p>
+        </div>
+        <div class="report-actions">
+          <button class="btn btn-primary" onclick="generatePDFReport()" data-i18n="genPDF">📄 Generate PDF Report</button>
+          <button class="btn" onclick="exportCSV()" data-i18n="expCSV">📊 Export CSV</button>
+          <button class="btn" onclick="exportJSON()" data-i18n="expJSON">💾 Export JSON</button>
+        </div>
+        <div class="report-summary" id="reportSummary"></div>
+        <div class="chart-row" id="reportCharts"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
+
+<script>
+// ══════════════════════════════════════════════
+// CISDash - Core Engine
+// Author: Ali AlEnezi (SiteQ8)
+// ══════════════════════════════════════════════
+
+// ── Internationalization ──
+const i18n = {
+  en: {
+    appTitle: "CISDash",
+    appSub: "MULTI-FRAMEWORK COMPLIANCE DASHBOARD",
+    exportBtn: "💾 Export", importBtn: "📂 Import", reportBtn: "📊 Report",
+    navMain: "Main", navDashboard: "Dashboard", navChecker: "Compliance Checker",
+    navControls: "CIS Controls", navMapping: "Mapping", navMatrix: "Mapping Matrix",
+    navFrameworks: "Frameworks", navReports: "Reports", navReport: "Assessment Report",
+    dashTitle: "Compliance Overview",
+    dashSub: "Real-time compliance posture across CIS, PCI DSS, ISO 27001, SWIFT CSP & Kuwait CBK CORF",
+    recentActivity: "Recent Assessment Activity",
+    checkerTitle: "Compliance Checker",
+    checkerSub: "Interactively assess your compliance with CIS Controls v8",
+    searchChecks: "Search checks...",
+    filterAll: "All Categories", runAssess: "▶ Run Assessment",
+    controlsTitle: "CIS Controls v8",
+    controlsSub: "All 18 CIS Controls with status tracking and framework mapping",
+    searchControls: "Search controls...",
+    statusCompliant: "Compliant", statusPartial: "Partially Compliant",
+    statusNonCompliant: "Non-Compliant", statusNotAssessed: "Not Assessed",
+    thID: "ID", thControl: "Control", thMapping: "Mapping", thStatus: "Status", thAction: "Action",
+    mappingTitle: "Cross-Framework Mapping Matrix",
+    mappingSub: "See how CIS Controls map to PCI DSS, ISO 27001, SWIFT CSP, and Kuwait CBK CORF",
+    fwTitle: "Supported Frameworks", fwSub: "Comprehensive coverage across international and regional compliance standards",
+    rptTitle: "Assessment Report", rptSub: "Generate and export compliance assessment reports",
+    genPDF: "📄 Generate PDF Report", expCSV: "📊 Export CSV", expJSON: "💾 Export JSON",
+    compliant: "Compliant", partial: "Partial", nonCompliant: "Non-Compliant", notAssessed: "Not Assessed",
+    totalControls: "Total Controls", assessed: "Assessed", complianceRate: "Compliance Rate",
+    cisScore: "CIS SCORE", pciScore: "PCI DSS", isoScore: "ISO 27001", swiftScore: "SWIFT CSP", corfScore: "CBK CORF",
+    noActivity: "No assessment activity yet. Run the Compliance Checker to get started.",
+  },
+  ar: {
+    appTitle: "CISDash",
+    appSub: "لوحة معلومات الامتثال متعددة الأطر",
+    exportBtn: "💾 تصدير", importBtn: "📂 استيراد", reportBtn: "📊 تقرير",
+    navMain: "الرئيسية", navDashboard: "لوحة المعلومات", navChecker: "فاحص الامتثال",
+    navControls: "ضوابط CIS", navMapping: "الربط", navMatrix: "مصفوفة الربط",
+    navFrameworks: "الأطر التنظيمية", navReports: "التقارير", navReport: "تقرير التقييم",
+    dashTitle: "نظرة عامة على الامتثال",
+    dashSub: "حالة الامتثال الحية عبر CIS و PCI DSS و ISO 27001 و SWIFT CSP و CBK CORF الكويت",
+    recentActivity: "نشاط التقييم الأخير",
+    checkerTitle: "فاحص الامتثال",
+    checkerSub: "تقييم تفاعلي لامتثالك مع ضوابط CIS الإصدار 8",
+    searchChecks: "...البحث في الفحوصات",
+    filterAll: "جميع الفئات", runAssess: "▶ تشغيل التقييم",
+    controlsTitle: "ضوابط CIS الإصدار 8",
+    controlsSub: "جميع ضوابط CIS الـ 18 مع تتبع الحالة وربط الأطر التنظيمية",
+    searchControls: "...البحث في الضوابط",
+    statusCompliant: "ممتثل", statusPartial: "ممتثل جزئياً",
+    statusNonCompliant: "غير ممتثل", statusNotAssessed: "لم يتم التقييم",
+    thID: "المعرف", thControl: "الضابط", thMapping: "الربط", thStatus: "الحالة", thAction: "الإجراء",
+    mappingTitle: "مصفوفة الربط عبر الأطر التنظيمية",
+    mappingSub: "كيف ترتبط ضوابط CIS مع PCI DSS و ISO 27001 و SWIFT CSP و CBK CORF الكويت",
+    fwTitle: "الأطر التنظيمية المدعومة", fwSub: "تغطية شاملة عبر المعايير الدولية والإقليمية",
+    rptTitle: "تقرير التقييم", rptSub: "إنشاء وتصدير تقارير تقييم الامتثال",
+    genPDF: "📄 إنشاء تقرير PDF", expCSV: "📊 تصدير CSV", expJSON: "💾 تصدير JSON",
+    compliant: "ممتثل", partial: "جزئي", nonCompliant: "غير ممتثل", notAssessed: "لم يُقيّم",
+    totalControls: "إجمالي الضوابط", assessed: "تم التقييم", complianceRate: "معدل الامتثال",
+    cisScore: "نتيجة CIS", pciScore: "PCI DSS", isoScore: "ISO 27001", swiftScore: "SWIFT CSP", corfScore: "CBK CORF",
+    noActivity: "لا يوجد نشاط تقييم بعد. قم بتشغيل فاحص الامتثال للبدء.",
+  }
+};
+
+let currentLang = 'en';
+
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'ar' : 'en';
+  document.documentElement.lang = currentLang;
+  document.body.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+  applyTranslations();
+}
+
+function t(key) {
+  return i18n[currentLang][key] || i18n.en[key] || key;
+}
+
+function applyTranslations() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (i18n[currentLang][key]) el.textContent = i18n[currentLang][key];
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    if (i18n[currentLang][key]) el.placeholder = i18n[currentLang][key];
+  });
+  renderAll();
+}
+
+// ── CIS Controls v8 Data ──
+const cisControls = [
+  { id: "CIS.1", title: "Inventory and Control of Enterprise Assets", titleAr: "جرد ومراقبة أصول المؤسسة", category: "asset", status: "not-assessed",
+    pci: ["2.4","9.9","11.1"], iso: ["A.8.1","A.8.2"], swift: ["1.1"], corf: ["CR-1.1","CR-1.2"],
+    checks: [
+      { en: "Maintain detailed inventory of all enterprise assets", ar: "الحفاظ على جرد تفصيلي لجميع أصول المؤسسة", checked: false },
+      { en: "Use active discovery tool to identify assets on network", ar: "استخدام أداة اكتشاف نشطة لتحديد الأصول على الشبكة", checked: false },
+      { en: "Ensure unauthorized assets are addressed", ar: "ضمان معالجة الأصول غير المصرح بها", checked: false },
+      { en: "Use DHCP logging to update asset inventory", ar: "استخدام سجلات DHCP لتحديث جرد الأصول", checked: false },
+    ]
+  },
+  { id: "CIS.2", title: "Inventory and Control of Software Assets", titleAr: "جرد ومراقبة الأصول البرمجية", category: "asset", status: "not-assessed",
+    pci: ["2.4","6.2"], iso: ["A.8.1","A.12.5"], swift: ["1.2","2.6"], corf: ["CR-1.3"],
+    checks: [
+      { en: "Maintain detailed inventory of all licensed software", ar: "الحفاظ على جرد تفصيلي لجميع البرمجيات المرخصة", checked: false },
+      { en: "Ensure only authorized software is installed", ar: "ضمان تثبيت البرمجيات المصرح بها فقط", checked: false },
+      { en: "Use application whitelisting on all assets", ar: "استخدام القائمة البيضاء للتطبيقات على جميع الأصول", checked: false },
+    ]
+  },
+  { id: "CIS.3", title: "Data Protection", titleAr: "حماية البيانات", category: "data", status: "not-assessed",
+    pci: ["3.4","4.1","9.5"], iso: ["A.8.2","A.10.1","A.13.2"], swift: ["2.1","2.3"], corf: ["CR-2.1","CR-2.2"],
+    checks: [
+      { en: "Establish and maintain a data management process", ar: "إنشاء وصيانة عملية إدارة البيانات", checked: false },
+      { en: "Encrypt data at rest on all endpoints", ar: "تشفير البيانات المخزنة على جميع الأجهزة الطرفية", checked: false },
+      { en: "Encrypt sensitive data in transit", ar: "تشفير البيانات الحساسة أثناء النقل", checked: false },
+      { en: "Implement data classification and handling policy", ar: "تطبيق سياسة تصنيف البيانات والتعامل معها", checked: false },
+    ]
+  },
+  { id: "CIS.4", title: "Secure Configuration of Enterprise Assets and Software", titleAr: "التكوين الآمن للأصول والبرمجيات", category: "config", status: "not-assessed",
+    pci: ["2.1","2.2","2.3"], iso: ["A.12.1","A.14.2"], swift: ["2.2","2.3"], corf: ["CR-3.1","CR-3.2"],
+    checks: [
+      { en: "Establish and maintain a secure configuration process", ar: "إنشاء وصيانة عملية تكوين آمن", checked: false },
+      { en: "Configure automatic session locking on endpoints", ar: "تكوين قفل الجلسة التلقائي على الأجهزة الطرفية", checked: false },
+      { en: "Implement and manage a firewall on servers", ar: "تطبيق وإدارة جدار حماية على الخوادم", checked: false },
+    ]
+  },
+  { id: "CIS.5", title: "Account Management", titleAr: "إدارة الحسابات", category: "identity", status: "not-assessed",
+    pci: ["7.1","7.2","8.1"], iso: ["A.9.2","A.9.4"], swift: ["4.1","4.2"], corf: ["CR-4.1","CR-4.2"],
+    checks: [
+      { en: "Establish and maintain an inventory of accounts", ar: "إنشاء وصيانة جرد الحسابات", checked: false },
+      { en: "Use unique passwords for all enterprise assets", ar: "استخدام كلمات مرور فريدة لجميع أصول المؤسسة", checked: false },
+      { en: "Disable dormant accounts after 45 days", ar: "تعطيل الحسابات الخاملة بعد 45 يوماً", checked: false },
+      { en: "Restrict administrator privileges to dedicated accounts", ar: "تقييد صلاحيات المسؤول للحسابات المخصصة", checked: false },
+    ]
+  },
+  { id: "CIS.6", title: "Access Control Management", titleAr: "إدارة التحكم في الوصول", category: "identity", status: "not-assessed",
+    pci: ["7.1","7.2","7.3"], iso: ["A.9.1","A.9.2","A.9.4"], swift: ["4.1","5.1"], corf: ["CR-4.3","CR-4.4"],
+    checks: [
+      { en: "Establish an access granting process", ar: "إنشاء عملية منح الوصول", checked: false },
+      { en: "Establish an access revoking process", ar: "إنشاء عملية إلغاء الوصول", checked: false },
+      { en: "Require MFA for externally exposed applications", ar: "اشتراط المصادقة متعددة العوامل للتطبيقات المكشوفة خارجياً", checked: false },
+    ]
+  },
+  { id: "CIS.7", title: "Continuous Vulnerability Management", titleAr: "إدارة الثغرات المستمرة", category: "vuln", status: "not-assessed",
+    pci: ["5.1","5.2","6.1","11.2"], iso: ["A.12.6","A.14.2"], swift: ["2.7"], corf: ["CR-5.1","CR-5.2"],
+    checks: [
+      { en: "Establish and maintain a vulnerability management process", ar: "إنشاء وصيانة عملية إدارة الثغرات", checked: false },
+      { en: "Perform automated OS vulnerability scanning", ar: "إجراء فحص تلقائي لثغرات نظام التشغيل", checked: false },
+      { en: "Remediate detected vulnerabilities", ar: "معالجة الثغرات المكتشفة", checked: false },
+      { en: "Perform automated application vulnerability scanning", ar: "إجراء فحص تلقائي لثغرات التطبيقات", checked: false },
+    ]
+  },
+  { id: "CIS.8", title: "Audit Log Management", titleAr: "إدارة سجلات التدقيق", category: "audit", status: "not-assessed",
+    pci: ["10.1","10.2","10.3","10.5"], iso: ["A.12.4"], swift: ["6.4"], corf: ["CR-6.1","CR-6.2"],
+    checks: [
+      { en: "Establish and maintain an audit log management process", ar: "إنشاء وصيانة عملية إدارة سجلات التدقيق", checked: false },
+      { en: "Collect audit logs from all enterprise assets", ar: "جمع سجلات التدقيق من جميع أصول المؤسسة", checked: false },
+      { en: "Ensure adequate storage for audit logs", ar: "ضمان تخزين كافٍ لسجلات التدقيق", checked: false },
+    ]
+  },
+  { id: "CIS.9", title: "Email and Web Browser Protections", titleAr: "حماية البريد الإلكتروني ومتصفحات الويب", category: "protect", status: "not-assessed",
+    pci: ["5.1"], iso: ["A.13.1","A.13.2"], swift: ["2.6"], corf: ["CR-7.1"],
+    checks: [
+      { en: "Ensure use of only fully supported browsers and email clients", ar: "ضمان استخدام متصفحات وعملاء بريد مدعومين بالكامل فقط", checked: false },
+      { en: "Use DNS filtering services", ar: "استخدام خدمات تصفية DNS", checked: false },
+      { en: "Block unnecessary file types from email gateway", ar: "حظر أنواع الملفات غير الضرورية من بوابة البريد", checked: false },
+    ]
+  },
+  { id: "CIS.10", title: "Malware Defenses", titleAr: "الدفاعات ضد البرمجيات الخبيثة", category: "protect", status: "not-assessed",
+    pci: ["5.1","5.2","5.3"], iso: ["A.12.2"], swift: ["2.6","6.1"], corf: ["CR-7.2","CR-7.3"],
+    checks: [
+      { en: "Deploy and maintain anti-malware software", ar: "نشر وصيانة برامج مكافحة البرمجيات الخبيثة", checked: false },
+      { en: "Configure automatic anti-malware signature updates", ar: "تكوين تحديثات توقيعات مكافحة البرمجيات الخبيثة التلقائية", checked: false },
+      { en: "Disable autorun and autoplay for removable media", ar: "تعطيل التشغيل التلقائي للوسائط القابلة للإزالة", checked: false },
+    ]
+  },
+  { id: "CIS.11", title: "Data Recovery", titleAr: "استعادة البيانات", category: "recover", status: "not-assessed",
+    pci: ["9.5","12.10"], iso: ["A.12.3","A.17.1"], swift: ["2.5"], corf: ["OR-1.1","OR-1.2"],
+    checks: [
+      { en: "Establish and maintain a data recovery process", ar: "إنشاء وصيانة عملية استعادة البيانات", checked: false },
+      { en: "Perform automated backups", ar: "إجراء نسخ احتياطي تلقائي", checked: false },
+      { en: "Test data recovery procedures regularly", ar: "اختبار إجراءات استعادة البيانات بانتظام", checked: false },
+    ]
+  },
+  { id: "CIS.12", title: "Network Infrastructure Management", titleAr: "إدارة البنية التحتية للشبكة", category: "network", status: "not-assessed",
+    pci: ["1.1","1.2","1.3","2.2"], iso: ["A.13.1"], swift: ["1.1","1.2"], corf: ["CR-8.1","CR-8.2"],
+    checks: [
+      { en: "Ensure network infrastructure is up to date", ar: "ضمان تحديث البنية التحتية للشبكة", checked: false },
+      { en: "Establish and maintain a secure network architecture", ar: "إنشاء وصيانة بنية شبكة آمنة", checked: false },
+      { en: "Securely manage network infrastructure", ar: "إدارة البنية التحتية للشبكة بشكل آمن", checked: false },
+    ]
+  },
+  { id: "CIS.13", title: "Network Monitoring and Defense", titleAr: "مراقبة والدفاع عن الشبكة", category: "network", status: "not-assessed",
+    pci: ["10.6","11.4"], iso: ["A.12.4","A.13.1"], swift: ["6.1","6.2"], corf: ["CR-8.3","CR-8.4"],
+    checks: [
+      { en: "Centralize security event alerting", ar: "مركزة تنبيهات الأحداث الأمنية", checked: false },
+      { en: "Deploy a network intrusion detection solution", ar: "نشر حل كشف التسلل الشبكي", checked: false },
+      { en: "Perform traffic filtering between network segments", ar: "إجراء تصفية حركة المرور بين أجزاء الشبكة", checked: false },
+    ]
+  },
+  { id: "CIS.14", title: "Security Awareness and Skills Training", titleAr: "التوعية الأمنية والتدريب على المهارات", category: "people", status: "not-assessed",
+    pci: ["12.6"], iso: ["A.7.2"], swift: ["7.1","7.2"], corf: ["CR-9.1","CR-9.2"],
+    checks: [
+      { en: "Establish and maintain a security awareness program", ar: "إنشاء وصيانة برنامج توعية أمنية", checked: false },
+      { en: "Train workforce on identifying social engineering attacks", ar: "تدريب القوى العاملة على تحديد هجمات الهندسة الاجتماعية", checked: false },
+      { en: "Train workforce on authentication best practices", ar: "تدريب القوى العاملة على أفضل ممارسات المصادقة", checked: false },
+    ]
+  },
+  { id: "CIS.15", title: "Service Provider Management", titleAr: "إدارة مقدمي الخدمات", category: "supply", status: "not-assessed",
+    pci: ["12.8","12.9"], iso: ["A.15.1","A.15.2"], swift: ["7.3"], corf: ["TPRM-1.1","TPRM-1.2"],
+    checks: [
+      { en: "Establish and maintain a service provider inventory", ar: "إنشاء وصيانة جرد مقدمي الخدمات", checked: false },
+      { en: "Establish and maintain a service provider management policy", ar: "إنشاء وصيانة سياسة إدارة مقدمي الخدمات", checked: false },
+      { en: "Classify service providers by risk", ar: "تصنيف مقدمي الخدمات حسب المخاطر", checked: false },
+    ]
+  },
+  { id: "CIS.16", title: "Application Software Security", titleAr: "أمان البرمجيات التطبيقية", category: "appsec", status: "not-assessed",
+    pci: ["6.3","6.5","6.6"], iso: ["A.14.1","A.14.2"], swift: ["2.7","2.8"], corf: ["CR-10.1"],
+    checks: [
+      { en: "Establish and maintain a secure application development process", ar: "إنشاء وصيانة عملية تطوير تطبيقات آمنة", checked: false },
+      { en: "Perform application security testing", ar: "إجراء اختبار أمان التطبيقات", checked: false },
+      { en: "Use updated compiler/linker security features", ar: "استخدام ميزات أمان المترجم/الرابط المحدثة", checked: false },
+    ]
+  },
+  { id: "CIS.17", title: "Incident Response Management", titleAr: "إدارة الاستجابة للحوادث", category: "ir", status: "not-assessed",
+    pci: ["12.10"], iso: ["A.16.1"], swift: ["7.1"], corf: ["OR-2.1","OR-2.2"],
+    checks: [
+      { en: "Designate personnel to manage incident handling", ar: "تعيين أفراد لإدارة معالجة الحوادث", checked: false },
+      { en: "Establish and maintain an incident response process", ar: "إنشاء وصيانة عملية الاستجابة للحوادث", checked: false },
+      { en: "Conduct routine incident response exercises", ar: "إجراء تمارين استجابة للحوادث بشكل دوري", checked: false },
+    ]
+  },
+  { id: "CIS.18", title: "Penetration Testing", titleAr: "اختبار الاختراق", category: "test", status: "not-assessed",
+    pci: ["11.3"], iso: ["A.14.2","A.18.2"], swift: ["2.7"], corf: ["CR-5.3","CR-5.4"],
+    checks: [
+      { en: "Establish and maintain a penetration testing program", ar: "إنشاء وصيانة برنامج اختبار الاختراق", checked: false },
+      { en: "Perform periodic external penetration tests", ar: "إجراء اختبارات اختراق خارجية دورية", checked: false },
+      { en: "Perform periodic internal penetration tests", ar: "إجراء اختبارات اختراق داخلية دورية", checked: false },
+      { en: "Remediate penetration test findings", ar: "معالجة نتائج اختبارات الاختراق", checked: false },
+    ]
+  },
+];
+
+const categoryNames = {
+  en: { asset: "Asset Management", data: "Data Protection", config: "Configuration", identity: "Identity & Access",
+        vuln: "Vulnerability Mgmt", audit: "Audit & Logging", protect: "Protection", recover: "Recovery",
+        network: "Network Security", people: "People & Training", supply: "Supply Chain", appsec: "App Security",
+        ir: "Incident Response", test: "Testing" },
+  ar: { asset: "إدارة الأصول", data: "حماية البيانات", config: "التكوين", identity: "الهوية والوصول",
+        vuln: "إدارة الثغرات", audit: "التدقيق والسجلات", protect: "الحماية", recover: "الاستعادة",
+        network: "أمان الشبكة", people: "الأفراد والتدريب", supply: "سلسلة التوريد", appsec: "أمان التطبيقات",
+        ir: "الاستجابة للحوادث", test: "الاختبار" }
+};
+
+let assessmentHistory = [];
+
+// ── Page Navigation ──
+function showPage(pageId, element) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  if (element) element.classList.add('active');
+  if (pageId === 'dashboard') renderDashboard();
+  if (pageId === 'report') renderReport();
+}
+
+// ── Compute Stats ──
+function getStats() {
+  const total = cisControls.length;
+  const counts = { compliant: 0, partial: 0, 'non-compliant': 0, 'not-assessed': 0 };
+  cisControls.forEach(c => counts[c.status]++);
+  const assessed = total - counts['not-assessed'];
+  const score = assessed > 0 ? Math.round(((counts.compliant + counts.partial * 0.5) / assessed) * 100) : 0;
+  return { total, counts, assessed, score };
+}
+
+function getFrameworkScore(fw) {
+  const relevant = cisControls.filter(c => c[fw] && c[fw].length > 0);
+  const assessed = relevant.filter(c => c.status !== 'not-assessed');
+  if (assessed.length === 0) return 0;
+  const score = assessed.reduce((sum, c) => sum + (c.status === 'compliant' ? 1 : c.status === 'partial' ? 0.5 : 0), 0);
+  return Math.round((score / assessed.length) * 100);
+}
+
+// ── SVG Donut Chart ──
+function createDonut(segments, size=160) {
+  const r = 60, circ = 2 * Math.PI * r;
+  let offset = 0;
+  let paths = '';
+  segments.forEach(seg => {
+    const len = (seg.pct / 100) * circ;
+    paths += `<circle cx="80" cy="80" r="${r}" fill="none" stroke="${seg.color}" stroke-width="14" 
+      stroke-dasharray="${len} ${circ - len}" stroke-dashoffset="${-offset}" stroke-linecap="round" opacity="0.9"/>`;
+    offset += len;
+  });
+  return `<svg viewBox="0 0 160 160">${paths}</svg>`;
+}
+
+// ── Render Dashboard ──
+function renderDashboard() {
+  const stats = getStats();
+  const pciScore = getFrameworkScore('pci');
+  const isoScore = getFrameworkScore('iso');
+  const swiftScore = getFrameworkScore('swift');
+  const corfScore = getFrameworkScore('corf');
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card cis">
+      <div class="stat-label">${t('cisScore')}</div>
+      <div class="stat-value" style="color:#3b82f6">${stats.score}%</div>
+      <div class="stat-sub">${stats.counts.compliant} ${t('compliant')} / ${stats.total} ${t('totalControls')}</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${stats.score}%;background:var(--gradient-cis)"></div></div>
+    </div>
+    <div class="stat-card pci">
+      <div class="stat-label">${t('pciScore')}</div>
+      <div class="stat-value" style="color:#8b5cf6">${pciScore}%</div>
+      <div class="stat-sub">PCI DSS v4.0 Coverage</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${pciScore}%;background:var(--gradient-pci)"></div></div>
+    </div>
+    <div class="stat-card iso">
+      <div class="stat-label">${t('isoScore')}</div>
+      <div class="stat-value" style="color:#10b981">${isoScore}%</div>
+      <div class="stat-sub">ISO/IEC 27001:2022</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${isoScore}%;background:var(--gradient-iso)"></div></div>
+    </div>
+    <div class="stat-card swift">
+      <div class="stat-label">${t('swiftScore')}</div>
+      <div class="stat-value" style="color:#f59e0b">${swiftScore}%</div>
+      <div class="stat-sub">SWIFT CSP v2024</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${swiftScore}%;background:var(--gradient-swift)"></div></div>
+    </div>
+    <div class="stat-card corf">
+      <div class="stat-label">${t('corfScore')}</div>
+      <div class="stat-value" style="color:#d4a843">${corfScore}%</div>
+      <div class="stat-sub">Kuwait CBK CORF v1.0</div>
+      <div class="stat-bar"><div class="stat-bar-fill" style="width:${corfScore}%;background:var(--gradient-corf)"></div></div>
+    </div>
+  `;
+
+  // Donut Charts
+  const segments = [
+    { pct: (stats.counts.compliant/stats.total)*100, color: '#10b981' },
+    { pct: (stats.counts.partial/stats.total)*100, color: '#f59e0b' },
+    { pct: (stats.counts['non-compliant']/stats.total)*100, color: '#ef4444' },
+    { pct: (stats.counts['not-assessed']/stats.total)*100, color: '#334155' },
+  ];
+
+  document.getElementById('chartRow').innerHTML = `
+    <div class="chart-box">
+      <h3>CIS Controls Compliance</h3>
+      <div class="donut-wrap">
+        ${createDonut(segments)}
+        <div class="center-label">
+          <div class="pct">${stats.score}%</div>
+          <div class="sub">${t('complianceRate')}</div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div>${t('compliant')} (${stats.counts.compliant})</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div>${t('partial')} (${stats.counts.partial})</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div>${t('nonCompliant')} (${stats.counts['non-compliant']})</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#334155"></div>${t('notAssessed')} (${stats.counts['not-assessed']})</div>
+      </div>
+    </div>
+    <div class="chart-box">
+      <h3>Framework Coverage</h3>
+      <div style="width:100%;display:flex;flex-direction:column;gap:14px;padding:10px 0;">
+        ${[
+          {name:'CIS v8', score:stats.score, grad:'var(--gradient-cis)', color:'#3b82f6'},
+          {name:'PCI DSS', score:pciScore, grad:'var(--gradient-pci)', color:'#8b5cf6'},
+          {name:'ISO 27001', score:isoScore, grad:'var(--gradient-iso)', color:'#10b981'},
+          {name:'SWIFT CSP', score:swiftScore, grad:'var(--gradient-swift)', color:'#f59e0b'},
+          {name:'CBK CORF', score:corfScore, grad:'var(--gradient-corf)', color:'#d4a843'},
+        ].map(f => `
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+              <span>${f.name}</span>
+              <span style="font-family:var(--font-mono);color:${f.color};font-weight:600">${f.score}%</span>
+            </div>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width:${f.score}%;background:${f.grad}"></div></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Activity
+  const al = document.getElementById('activityLog');
+  if (assessmentHistory.length === 0) {
+    al.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:20px;">${t('noActivity')}</p>`;
+  } else {
+    al.innerHTML = assessmentHistory.slice(-5).reverse().map(a => `
+      <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:20px;">${a.score >= 75 ? '🟢' : a.score >= 50 ? '🟡' : '🔴'}</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500;">${currentLang==='ar'?'تقييم - ':'Assessment - '}${a.date}</div>
+          <div style="font-size:11px;color:var(--text-muted);">Score: ${a.score}% | ${a.assessed}/${a.total} controls assessed</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// ── Render Checker ──
+function renderChecker() {
+  const grid = document.getElementById('checkerGrid');
+  const cats = [...new Set(cisControls.map(c => c.category))];
+
+  // Populate filter
+  const filter = document.getElementById('checkerFilter');
+  filter.innerHTML = `<option value="all">${t('filterAll')}</option>` +
+    cats.map(cat => `<option value="${cat}">${categoryNames[currentLang][cat] || cat}</option>`).join('');
+
+  renderCheckerGrid(cisControls);
+}
+
+function renderCheckerGrid(controls) {
+  const grid = document.getElementById('checkerGrid');
+  grid.innerHTML = controls.map(ctrl => `
+    <div class="check-category" data-category="${ctrl.category}" data-id="${ctrl.id}">
+      <div class="check-category-title">
+        <span class="control-id">${ctrl.id}</span>
+        ${currentLang === 'ar' ? ctrl.titleAr : ctrl.title}
+      </div>
+      ${ctrl.checks.map((ch, i) => `
+        <div class="check-item">
+          <input type="checkbox" ${ch.checked ? 'checked' : ''} 
+            onchange="toggleCheck('${ctrl.id}', ${i}, this.checked)">
+          <span class="check-label">${currentLang === 'ar' ? ch.ar : ch.en}</span>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function toggleCheck(ctrlId, checkIdx, checked) {
+  const ctrl = cisControls.find(c => c.id === ctrlId);
+  if (ctrl) ctrl.checks[checkIdx].checked = checked;
+}
+
+function filterChecks() {
+  const search = document.getElementById('checkerSearch').value.toLowerCase();
+  const cat = document.getElementById('checkerFilter').value;
+  const filtered = cisControls.filter(c => {
+    const matchCat = cat === 'all' || c.category === cat;
+    const matchSearch = !search || c.title.toLowerCase().includes(search) || c.titleAr.includes(search) || c.id.toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+  renderCheckerGrid(filtered);
+}
+
+function runAssessment() {
+  cisControls.forEach(ctrl => {
+    const total = ctrl.checks.length;
+    const checked = ctrl.checks.filter(ch => ch.checked).length;
+    if (checked === 0) ctrl.status = 'not-assessed';
+    else if (checked === total) ctrl.status = 'compliant';
+    else if (checked >= total / 2) ctrl.status = 'partial';
+    else ctrl.status = 'non-compliant';
+  });
+
+  const stats = getStats();
+  assessmentHistory.push({
+    date: new Date().toLocaleDateString(),
+    score: stats.score,
+    assessed: stats.assessed,
+    total: stats.total
+  });
+
+  saveState();
+  renderAll();
+  showPage('dashboard', document.querySelector('[data-page="dashboard"]'));
+}
+
+// ── Render Controls Table ──
+function renderControls() {
+  const tbody = document.getElementById('controlsTableBody');
+  renderControlsTable(cisControls, tbody);
+}
+
+function renderControlsTable(controls, tbody) {
+  tbody.innerHTML = controls.map(ctrl => {
+    const statusClass = ctrl.status;
+    const statusText = t(ctrl.status === 'non-compliant' ? 'nonCompliant' : ctrl.status === 'not-assessed' ? 'notAssessed' : ctrl.status);
+    const statusIcon = ctrl.status === 'compliant' ? '●' : ctrl.status === 'partial' ? '◐' : ctrl.status === 'non-compliant' ? '○' : '—';
+
+    return `
+      <tr data-status="${ctrl.status}" data-id="${ctrl.id}">
+        <td><span class="control-id">${ctrl.id}</span></td>
+        <td style="max-width:300px">${currentLang === 'ar' ? ctrl.titleAr : ctrl.title}</td>
+        <td>
+          <div class="mapping-tags">
+            ${ctrl.pci.length ? `<span class="mapping-tag pci">PCI ${ctrl.pci[0]}</span>` : ''}
+            ${ctrl.iso.length ? `<span class="mapping-tag iso">ISO ${ctrl.iso[0]}</span>` : ''}
+            ${ctrl.swift.length ? `<span class="mapping-tag swift">SWIFT ${ctrl.swift[0]}</span>` : ''}
+            ${ctrl.corf.length ? `<span class="mapping-tag corf">CORF ${ctrl.corf[0]}</span>` : ''}
+          </div>
+        </td>
+        <td><span class="status-badge ${statusClass}">${statusIcon} ${statusText}</span></td>
+        <td>
+          <select class="status-select" onchange="updateStatus('${ctrl.id}', this.value)">
+            <option value="not-assessed" ${ctrl.status==='not-assessed'?'selected':''}>${t('notAssessed')}</option>
+            <option value="compliant" ${ctrl.status==='compliant'?'selected':''}>${t('compliant')}</option>
+            <option value="partial" ${ctrl.status==='partial'?'selected':''}>${t('partial')}</option>
+            <option value="non-compliant" ${ctrl.status==='non-compliant'?'selected':''}>${t('nonCompliant')}</option>
+          </select>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateStatus(ctrlId, status) {
+  const ctrl = cisControls.find(c => c.id === ctrlId);
+  if (ctrl) {
+    ctrl.status = status;
+    saveState();
+    renderDashboard();
+    renderControls();
+  }
+}
+
+function filterControls() {
+  const search = document.getElementById('controlSearch').value.toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const fw = document.getElementById('frameworkFilter').value;
+  const filtered = cisControls.filter(c => {
+    const matchSearch = !search || c.title.toLowerCase().includes(search) || c.titleAr.includes(search) || c.id.toLowerCase().includes(search);
+    const matchStatus = status === 'all' || c.status === status;
+    const matchFw = fw === 'all' || (c[fw] && c[fw].length > 0);
+    return matchSearch && matchStatus && matchFw;
+  });
+  renderControlsTable(filtered, document.getElementById('controlsTableBody'));
+}
+
+// ── Render Mapping Matrix ──
+function renderMapping() {
+  const container = document.getElementById('mappingMatrix');
+  container.innerHTML = `
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>CIS Control</th>
+          <th style="background:rgba(139,92,246,0.15)">PCI DSS v4.0</th>
+          <th style="background:rgba(16,185,129,0.15)">ISO 27001:2022</th>
+          <th style="background:rgba(245,158,11,0.15)">SWIFT CSP</th>
+          <th style="background:rgba(212,168,67,0.15)">Kuwait CBK CORF</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${cisControls.map(c => `
+          <tr>
+            <td style="text-align:start;font-weight:500;">
+              <span class="control-id">${c.id}</span>
+              <span style="font-family:var(--font-body);font-size:11px;color:var(--text-secondary);margin-inline-start:6px;">
+                ${currentLang === 'ar' ? c.titleAr : c.title}
+              </span>
+            </td>
+            <td class="${c.pci.length ? 'matrix-cell-active' : ''}">${c.pci.join(', ') || '—'}</td>
+            <td class="${c.iso.length ? 'matrix-cell-active' : ''}">${c.iso.join(', ') || '—'}</td>
+            <td class="${c.swift.length ? 'matrix-cell-active' : ''}">${c.swift.join(', ') || '—'}</td>
+            <td class="${c.corf.length ? 'matrix-cell-active' : ''}">${c.corf.join(', ') || '—'}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// ── Render Frameworks Page ──
+function renderFrameworks() {
+  const fws = [
+    { key: 'cis', name: 'CIS Controls v8', desc: 'Center for Internet Security - 18 Critical Security Controls',
+      descAr: 'مركز أمان الإنترنت - 18 ضابطاً أمنياً حرجاً', icon: '🛡️', color: '#3b82f6', gradient: 'var(--gradient-cis)', controls: 18 },
+    { key: 'pci', name: 'PCI DSS v4.0', desc: 'Payment Card Industry Data Security Standard',
+      descAr: 'معيار أمان بيانات صناعة بطاقات الدفع', icon: '💳', color: '#8b5cf6', gradient: 'var(--gradient-pci)', controls: 12 },
+    { key: 'iso', name: 'ISO/IEC 27001:2022', desc: 'Information Security Management System',
+      descAr: 'نظام إدارة أمن المعلومات', icon: '🏛️', color: '#10b981', gradient: 'var(--gradient-iso)', controls: 14 },
+    { key: 'swift', name: 'SWIFT CSP v2024', desc: 'Customer Security Programme - Financial Messaging',
+      descAr: 'برنامج أمان العملاء - الرسائل المالية', icon: '🏦', color: '#f59e0b', gradient: 'var(--gradient-swift)', controls: 7 },
+    { key: 'corf', name: 'Kuwait CBK CORF v1.0', desc: 'Central Bank of Kuwait - Cyber & Operational Resilience Framework',
+      descAr: 'البنك المركزي الكويتي - إطار المرونة السيبرانية والتشغيلية', icon: '🇰🇼', color: '#d4a843', gradient: 'var(--gradient-corf)', controls: 3 },
+  ];
+
+  document.getElementById('frameworkCards').innerHTML = fws.map(f => {
+    const score = f.key === 'cis' ? getStats().score : getFrameworkScore(f.key);
+    return `
+      <div class="stat-card ${f.key}" style="cursor:default;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <span style="font-size:28px;">${f.icon}</span>
+          <div>
+            <div style="font-size:15px;font-weight:600;">${f.name}</div>
+            <div style="font-size:11px;color:var(--text-muted);">${currentLang === 'ar' ? f.descAr : f.desc}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px;">
+          <span style="font-size:32px;font-weight:700;font-family:var(--font-mono);color:${f.color}">${score}%</span>
+          <span style="font-size:12px;color:var(--text-muted);">${t('complianceRate')}</span>
+        </div>
+        <div class="stat-bar" style="margin-top:12px;"><div class="stat-bar-fill" style="width:${score}%;background:${f.gradient}"></div></div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:10px;">${f.controls} ${currentLang==='ar'?'ضوابط مرتبطة':'mapped controls'}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── Render Report ──
+function renderReport() {
+  const stats = getStats();
+  document.getElementById('reportSummary').innerHTML = `
+    <div class="report-metric"><div class="big" style="color:var(--accent-blue)">${stats.total}</div><div class="label">${t('totalControls')}</div></div>
+    <div class="report-metric"><div class="big" style="color:var(--accent-cyan)">${stats.assessed}</div><div class="label">${t('assessed')}</div></div>
+    <div class="report-metric"><div class="big" style="color:var(--accent-green)">${stats.counts.compliant}</div><div class="label">${t('compliant')}</div></div>
+    <div class="report-metric"><div class="big" style="color:var(--accent-amber)">${stats.counts.partial}</div><div class="label">${t('partial')}</div></div>
+    <div class="report-metric"><div class="big" style="color:var(--accent-red)">${stats.counts['non-compliant']}</div><div class="label">${t('nonCompliant')}</div></div>
+    <div class="report-metric"><div class="big" style="color:var(--accent-blue)">${stats.score}%</div><div class="label">${t('complianceRate')}</div></div>
+  `;
+
+  document.getElementById('reportCharts').innerHTML = document.getElementById('chartRow').innerHTML;
+}
+
+// ── Export / Import ──
+function exportJSON() {
+  const data = {
+    version: "1.0",
+    date: new Date().toISOString(),
+    controls: cisControls.map(c => ({ id: c.id, status: c.status, checks: c.checks.map(ch => ch.checked) })),
+    history: assessmentHistory
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `cis-assessment-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+}
+
+function importJSON() {
+  document.getElementById('importFile').click();
+}
+
+function handleImport(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.controls) {
+        data.controls.forEach(saved => {
+          const ctrl = cisControls.find(c => c.id === saved.id);
+          if (ctrl) {
+            ctrl.status = saved.status;
+            saved.checks.forEach((checked, i) => { if (ctrl.checks[i]) ctrl.checks[i].checked = checked; });
+          }
+        });
+      }
+      if (data.history) assessmentHistory = data.history;
+      saveState();
+      renderAll();
+      alert(currentLang === 'ar' ? 'تم الاستيراد بنجاح!' : 'Assessment imported successfully!');
+    } catch (err) {
+      alert('Error importing file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function exportCSV() {
+  let csv = 'CIS ID,Control,Status,PCI DSS,ISO 27001,SWIFT CSP,CBK CORF\n';
+  cisControls.forEach(c => {
+    csv += `"${c.id}","${c.title}","${c.status}","${c.pci.join('; ')}","${c.iso.join('; ')}","${c.swift.join('; ')}","${c.corf.join('; ')}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `cis-assessment-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+}
+
+function generatePDFReport() {
+  const stats = getStats();
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>CIS Compliance Report</title>
+    <style>
+      body{font-family:'IBM Plex Sans',Arial,sans-serif;padding:40px;color:#1a1a2e;max-width:900px;margin:0 auto;}
+      h1{color:#1a2235;border-bottom:3px solid #3b82f6;padding-bottom:10px;}
+      h2{color:#3b82f6;margin-top:30px;}
+      table{width:100%;border-collapse:collapse;margin:16px 0;}
+      th{background:#1a2235;color:white;padding:10px;text-align:left;font-size:12px;}
+      td{padding:8px 10px;border:1px solid #ddd;font-size:12px;}
+      tr:nth-child(even){background:#f8fafc;}
+      .score{font-size:48px;font-weight:bold;color:#3b82f6;}
+      .stat-row{display:flex;gap:20px;margin:20px 0;}
+      .stat-box{flex:1;background:#f8fafc;padding:20px;border-radius:8px;text-align:center;border:1px solid #e2e8f0;}
+      .stat-box .num{font-size:28px;font-weight:bold;}
+      .stat-box .lbl{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;}
+      .g{color:#10b981} .y{color:#f59e0b} .r{color:#ef4444} .b{color:#3b82f6}
+      .footer{margin-top:40px;padding-top:20px;border-top:2px solid #e2e8f0;font-size:11px;color:#64748b;text-align:center;}
+      @media print{body{padding:20px;}}
+    </style></head><body>
+    <h1>🛡️ CIS Compliance Assessment Report</h1>
+    <p style="color:#64748b">Generated: ${new Date().toLocaleString()} | Tool: CISDash by Ali AlEnezi</p>
+    <div class="stat-row">
+      <div class="stat-box"><div class="num b">${stats.score}%</div><div class="lbl">Overall Score</div></div>
+      <div class="stat-box"><div class="num">${stats.total}</div><div class="lbl">Total Controls</div></div>
+      <div class="stat-box"><div class="num g">${stats.counts.compliant}</div><div class="lbl">Compliant</div></div>
+      <div class="stat-box"><div class="num y">${stats.counts.partial}</div><div class="lbl">Partial</div></div>
+      <div class="stat-box"><div class="num r">${stats.counts['non-compliant']}</div><div class="lbl">Non-Compliant</div></div>
+    </div>
+    <h2>Framework Compliance Scores</h2>
+    <div class="stat-row">
+      <div class="stat-box"><div class="num b">${stats.score}%</div><div class="lbl">CIS v8</div></div>
+      <div class="stat-box"><div class="num" style="color:#8b5cf6">${getFrameworkScore('pci')}%</div><div class="lbl">PCI DSS</div></div>
+      <div class="stat-box"><div class="num g">${getFrameworkScore('iso')}%</div><div class="lbl">ISO 27001</div></div>
+      <div class="stat-box"><div class="num y">${getFrameworkScore('swift')}%</div><div class="lbl">SWIFT CSP</div></div>
+      <div class="stat-box"><div class="num" style="color:#d4a843">${getFrameworkScore('corf')}%</div><div class="lbl">CBK CORF</div></div>
+    </div>
+    <h2>Detailed Control Status</h2>
+    <table>
+      <tr><th>ID</th><th>Control</th><th>Status</th><th>PCI DSS</th><th>ISO 27001</th><th>SWIFT CSP</th><th>CBK CORF</th></tr>
+      ${cisControls.map(c => `<tr>
+        <td><strong>${c.id}</strong></td><td>${c.title}</td>
+        <td class="${c.status==='compliant'?'g':c.status==='partial'?'y':c.status==='non-compliant'?'r':''}"><strong>${c.status.replace('-',' ')}</strong></td>
+        <td>${c.pci.join(', ')}</td><td>${c.iso.join(', ')}</td><td>${c.swift.join(', ')}</td><td>${c.corf.join(', ')}</td>
+      </tr>`).join('')}
+    </table>
+    <div class="footer">
+      <p>CISDash | Created by Ali AlEnezi (SiteQ8)</p>
+      <p>This report is auto-generated. Verify all findings independently.</p>
+    </div>
+    </body></html>`);
+  w.document.close();
+  setTimeout(() => w.print(), 500);
+}
+
+// ── Local State Persistence ──
+function saveState() {
+  try {
+    const state = {
+      controls: cisControls.map(c => ({ id: c.id, status: c.status, checks: c.checks.map(ch => ch.checked) })),
+      history: assessmentHistory
+    };
+    // Use in-memory only (no localStorage in this env)
+    window._cisState = state;
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const state = window._cisState;
+    if (state && state.controls) {
+      state.controls.forEach(saved => {
+        const ctrl = cisControls.find(c => c.id === saved.id);
+        if (ctrl) {
+          ctrl.status = saved.status;
+          saved.checks.forEach((checked, i) => { if (ctrl.checks[i]) ctrl.checks[i].checked = checked; });
+        }
+      });
+      if (state.history) assessmentHistory = state.history;
+    }
+  } catch(e) {}
+}
+
+// ── Render All ──
+function renderAll() {
+  renderDashboard();
+  renderChecker();
+  renderControls();
+  renderMapping();
+  renderFrameworks();
+  renderReport();
+}
+
+// ── Init ──
+loadState();
+renderAll();
+</script>
+</body>
+</html>
