@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🛡️ CISDash | لوحة الامتثال CIS
+# CISDash | لوحة الامتثال CIS
 
 ### Multi-Framework CIS Compliance Dashboard
 
@@ -17,7 +17,7 @@
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 ### Dashboard Overview
 ![Dashboard Overview](screenshots/dashboard.png)
@@ -25,9 +25,9 @@
 
 ### Compliance Checker
 ![Compliance Checker](screenshots/checker.png)
-*Interactive checklist-based assessment tool — check individual controls and run automated scoring.*
+*Interactive checklist-based assessment tool, check individual controls and run automated scoring.*
 
-### CIS Controls v8 — Full Tracking
+### CIS Controls v8: Full Tracking
 ![CIS Controls](screenshots/controls.png)
 *All 18 CIS Controls with status badges, framework mapping tags, and inline status management.*
 
@@ -37,23 +37,23 @@
 
 ### Arabic Interface (RTL)
 ![Arabic Interface](screenshots/arabic.png)
-*Full Arabic localization with proper RTL layout — built for the Kuwait and GCC cybersecurity community.*
+*Full Arabic localization with proper RTL layout, built for the Kuwait and GCC cybersecurity community.*
 
 ### Assessment Report (Print-Ready)
 ![Assessment Report](screenshots/report.png)
-*Generate comprehensive PDF reports with per-framework scores and detailed control status tables.*
+*Generate PDF reports with per-framework scores and detailed control status tables.*
 
 ---
 
-## 🚀 Features
+## Features
 
-### 🎯 Core Compliance Engine
+### Core Compliance Engine
 - **All 18 CIS Controls v8** with sub-control checklists (60+ individual checks)
-- **Interactive Compliance Checker** — tick-based assessment with automated scoring
-- **Per-control status tracking** — Compliant, Partially Compliant, Non-Compliant, Not Assessed
+- **Interactive Compliance Checker**: tick-based assessment with automated scoring
+- **Per-control status tracking**: Compliant, Partially Compliant, Non-Compliant, Not Assessed
 - **Real-time score calculation** across all frameworks simultaneously
 
-### 🔗 Multi-Framework Mapping
+### Multi-Framework Mapping
 | Framework | Version | Coverage |
 |-----------|---------|----------|
 | **CIS Controls** | v8 (2021) | 18 controls, 60+ sub-controls |
@@ -62,35 +62,35 @@
 | **SWIFT CSP** | v2024 | Customer Security Programme controls |
 | **Kuwait CBK CORF** | v1.0 (Dec 2025) | Cyber Resilience, Operational Resilience, TPRM baselines |
 
-### 🌐 Bilingual Support (English & Arabic)
-- **Full Arabic localization** — every label, title, and description
-- **RTL layout support** — proper right-to-left rendering
-- **One-click language toggle** — switch instantly between EN/AR
-- **Arabic control descriptions** — native translations, not machine-generated
+### Bilingual Support (English & Arabic)
+- **Full Arabic localization**: every label, title, and description
+- **RTL layout support**: proper right-to-left rendering
+- **One-click language toggle**: switch instantly between EN/AR
+- **Arabic control descriptions**: native translations, not machine-generated
 
-### 📊 Dashboard & Visualization
+### Dashboard & Visualization
 - **Overall compliance score** with animated progress bars
-- **Per-framework score cards** — CIS, PCI, ISO, SWIFT, CORF
-- **SVG donut charts** — compliance breakdown by status
-- **Framework coverage comparison** — side-by-side bar charts
-- **Assessment activity timeline** — historical tracking
+- **Per-framework score cards**: CIS, PCI, ISO, SWIFT, CORF
+- **SVG donut charts**: compliance breakdown by status
+- **Framework coverage comparison**: side-by-side bar charts
+- **Assessment activity timeline**: historical tracking
 
-### 📋 Reporting & Export
-- **PDF Report Generation** — print-ready, professional layout
-- **CSV Export** — for spreadsheet analysis
-- **JSON Export/Import** — save and restore assessment state
-- **Assessment History** — track progress over time
+### Reporting & Export
+- **PDF Report Generation**: print-ready, professional layout
+- **CSV Export**: for spreadsheet analysis
+- **JSON Export/Import**: save and restore assessment state
+- **Assessment History**: track progress over time
 
-### 🎨 Design & UX
-- **Dark cybersecurity theme** — navy/blue professional aesthetic
-- **Responsive design** — works on desktop, tablet, and mobile
-- **Zero dependencies** — pure HTML/CSS/JS, no frameworks needed
-- **GitHub Pages ready** — deploy in seconds
-- **Keyboard accessible** — full keyboard navigation support
+### Design & UX
+- **Dark cybersecurity theme**: navy/blue professional aesthetic
+- **Responsive design**: works on desktop, tablet, and mobile
+- **Zero dependencies**: pure HTML/CSS/JS, no frameworks needed
+- **GitHub Pages ready**: deploy in seconds
+- **Keyboard accessible**: full keyboard navigation support
 
 ---
 
-## 🏗️ Quick Start
+## Quick Start
 
 ### Option 1: GitHub Pages (Recommended)
 Simply visit the live demo:
@@ -116,7 +116,7 @@ No build step. No npm install. No dependencies. Just open and assess.
 
 ---
 
-## 📖 Usage Guide
+## Usage Guide
 
 ### Running a Compliance Assessment
 
@@ -140,7 +140,7 @@ No build step. No npm install. No dependencies. Just open and assess.
 
 ---
 
-## 🗺️ Framework Mapping Details
+## Framework Mapping Details
 
 ### Kuwait CBK CORF v1.0
 
@@ -148,7 +148,7 @@ The tool maps CIS Controls to all three CORF baselines:
 
 | CORF Baseline | Prefix | CIS Controls Mapped |
 |---------------|--------|-------------------|
-| Cyber Resilience | CR-x.x | CIS 1–10, 12–14, 16, 18 |
+| Cyber Resilience | CR-x.x | CIS 1-10, 12-14, 16, 18 |
 | Operational Resilience | OR-x.x | CIS 11, 17 |
 | Third-Party Risk Management | TPRM-x.x | CIS 15 |
 
@@ -162,7 +162,7 @@ Mapped to relevant PCI DSS requirements including:
 
 ---
 
-## 🛠️ Technical Architecture
+## Technical Architecture
 
 ```
 cisdash/
@@ -187,7 +187,7 @@ cisdash/
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Areas of interest:
 
@@ -200,15 +200,15 @@ Contributions are welcome! Areas of interest:
 
 ---
 
-## 📄 License
+## License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+This project is licensed under the MIT License, see [LICENSE](LICENSE) for details.
 
 ---
 
-## 👤 Author
+## Author
 
-**Ali AlEnezi** — [@SiteQ8](https://github.com/SiteQ8)
+**Ali AlEnezi**, [@SiteQ8](https://github.com/SiteQ8)
 
 📧 Site@hotmail.com
 🇰🇼 Kuwait
